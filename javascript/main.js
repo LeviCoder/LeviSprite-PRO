@@ -113,8 +113,8 @@ m = {
 
     // loops through the history
     for(var i = 0; i < this.history.length && h.length < 4; i++) {
-      // if 'h' does not already include this key, and the key does not relate to the current color, and is not the '.' key (blank) ...
-      if(!h.includes(this.history[i]) && m.color !== this.history[i] && this.history[i] !== ".") {
+      // if 'h' does not already include this key, and the key does not relate to the current color, and is not the '.' key (blank), and is in the palette...
+      if(!h.includes(this.history[i]) && m.color !== this.history[i] && this.history[i] !== "." && colors[this.history[i]]) {
         // approve and store
         h.push(this.history[i]);
       }
@@ -741,7 +741,7 @@ var buttons = {
   }, function() {
     pushSave("palettes", palettes);
     colors[lets[Object.keys(colors).length]] = color(255);
-    m.color = lets[Object.keys(colors).length - 1];
+    m.setColor(lets[Object.keys(colors).length - 1]);
     openWindow("picker");
   }, "main"),
 
@@ -1197,12 +1197,18 @@ var windows = {
     }},
     {txt: "duplicate", action: function() {
       if(Object.keys(palettes).length < 18) {
-        pushSave("palettes", palettes);
+        pushSave("palettes");
         palettes[(windows["palette options"].inp + " copy")] = palettes[windows["palette options"].inp];
         createPopup("rename palette", (windows["palette options"].inp + " copy"))
 
       } else {
         alert("Too many palettes, couldn't duplicate.")
+      }
+    }},
+    {txt: "delete", action: function() {
+      if(confirm("Deleting this palette could have unexpected consequences. Please be certain it will not be used. Continue?")) {
+        pushSave("palettes");
+        delete palettes[windows["palette options"].inp];
       }
     }},
   ]),
@@ -1212,12 +1218,15 @@ var windows = {
         pushSave("palettes", palettes);
         var n = lets[Object.keys(colors).length];
         colors[n] = colors[windows["swatch options"].inp];
-        m.color = n;
+        m.setColor(n);
         palettes[cInd] = colors;
         openWindow("picker");
       } else {
         alert("Too many swatches, couldn't duplicate.")
       }
+    }},
+    {txt: "delete", action: function() {
+      alert("It seemed too hard to code in this feature with the current system. I may add it in the future. Sorry for the inconvenience");
     }},
   ]),
 
@@ -1315,7 +1324,7 @@ popupCodes = {
 
 
   "save canvas": [function() {
-    var t = "\"";
+    var t = "\"" + cInd + "/";
 
     for(var y = 0; y < can.a.length; y++) {
       for(var x = 0; x < can.a[y].length; x++) {
