@@ -1,0 +1,109 @@
+
+:root {
+  --highlight: #eca31c;
+  --background: #282828;
+}
+
+body {
+  font-family: "Andale Mono", monospace;
+  background-color: var(--background);
+  display: flex;
+  align-items: cener;
+  justify-content: center;
+  padding: none;
+}
+
+
+canvas {
+  border: 2px solid #444;
+}
+
+#popup {
+  position: absolute;
+  left: inherit;
+  top: 8px;
+  width: 604px;
+  height: 604px;
+  z-index: 10;
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #0003;
+}
+
+.popup-window {
+
+  padding: 5%;
+
+  border-radius: 5px;
+  box-shadow: -5px 5px 15px 5px #0008;
+  background-color: #eee;
+  color: #777;
+}
+
+/*
+thank you w3schools :)
+*/
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #999;
+  opacity: 1; /* Firefox */
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #999;
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #999;
+}
+
+button, input {
+
+  color: #999;
+  background: #0001;
+  border: none;/*1px solid #aaa;*/
+  border-radius: 2px;
+  padding: 5px;
+  font-family: "Andale Mono", monospace;
+
+}
+.popup-window button {
+  float: right;
+  margin-left: 10px;
+  display: none;
+
+}
+.popup-window button:hover {
+  color: #888;
+  border-color: #bbb;
+  cursor: pointer;
+}
+
+.popup-window #pop-error {
+  display: none;
+
+  margin-top: 10px;
+  padding: 5px;
+
+  border-radius: 2px;
+
+  font-style: italic;
+  font-size: 12px;
+
+  background-color: #e91e4d33;
+  color: #e91e4d;
+}
+
+#popper {
+  margin-bottom: 5%;
+  overflow: scroll;
+  overflow-wrap: break-word;
+
+  max-width: 400px;
+  max-height: 500px;
+}
+
+#inputs {
+  display: flex;
+  justify-content: space-between;
+}
