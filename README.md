@@ -1,6 +1,6 @@
 
 # LeviSprite PRO
-###### only works on my computer
+[try it out from GitHub Pages](https://levicoder.github.io/LeviSprite-PRO/)
 
 I made this as a continuation of previous efforts to make a pixel art editor in processing.js, (now I've switched to p5.js). It is horribly custom and probably only works for making sprites in a bespoke format that i'm figuring out as we speak
 
