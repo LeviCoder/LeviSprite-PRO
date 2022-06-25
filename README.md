@@ -11,6 +11,10 @@ _please note: some features aren't added. if by some miracle you run the webpage
 
 <br>
 
+### Right click:
+- on canvas for quicktools panel
+- on palette button or color swatch for options
+
 ### Keyboard shortcuts
 i borrowed relevant keyboard shortcuts from Photoshop in case that made it easier for anyone
 
