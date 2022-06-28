@@ -226,7 +226,7 @@ can.draw = function() {
 }
 
 can.setPixSize(20);
-can.create(8, 11);
+can.create(3, 3);
 
 /*
 following two functions taken from (here)[https://www.30secondsofcode.org/js/] and adapted to JS by WalkWorthy (@powercoder on Khan Academy)
@@ -1191,7 +1191,9 @@ var windows = {
     {txt: "import palettes", action: function() {
       createPopup("import palette");
     }},
-    {txt: "import pixel data", action: false},
+    {txt: "import pixel data", action: function() {
+      createPopup("import canvas");
+    }},
   ]),
 
   "palette options": new Menu(350, 0, 150, "palette options", [
@@ -1327,16 +1329,18 @@ popupCodes = {
 
 
   "save canvas": [function() {
-    var t = "\"" + cInd + "/";
+    var t = "\"\": [\"\", \"" + cInd + "\", \"";
 
     for(var y = 0; y < can.a.length; y++) {
       for(var x = 0; x < can.a[y].length; x++) {
         t += can.a[y][x];
       }
-      t += ","
+      if(y < can.a.length - 1) {
+        t += ",";
+      }
     }
 
-    return t + "\"";
+    return t + "\"],";
   }, ["close"], function() { return true; }],
 
 
@@ -1409,6 +1413,56 @@ popupCodes = {
 
   }],
 
+  "import canvas": [function() {
+
+    return "<h2>Paste in <em>just</em> the art array</h2><input id='pop-answer' type='text' placeholder='[\"(name)\", \"(palette)\", \"(art string)\"],' size='40'><div id='pop-error'>operation failed.</div>";
+
+  }, ["cancel", "enter"], function(inp) {
+
+    // ["blocks", "bubble tea", "a..,.a.,..a"],
+
+    pushSave("canvas");
+
+    inp = inp.split("\", \"");
+
+    var a = [[]];
+
+    var y = 0, x = 0, comma = inp[2][inp[2].length - 1] === "," ? 3 : 2;
+    for(var i = 0; i < inp[2].length - comma; i++) {
+      if(inp[2][i] === ",") {
+        y++;
+        x = 0;
+        a.push([]);
+      } else {
+        a[y].push(inp[2][i])
+      }
+    }
+
+    if(palettes[inp[1]]) {
+      cInd = inp[1];
+      colors = palettes[cInd];
+    }
+
+    can.create(a);
+
+    return true;
+
+  }],
+
+  "resize canvas": [function() {
+
+    return "<h2>Resize canvas</h2><p>only the format WIDTHxHEIGHT works. Limit of 20x20. Wacky inputs will default to 8.</p><input id='pop-answer' type='text' placeholder='e.g. 8x8 or 16x16'><div id='pop-error'>make sure it's in the right format</div>";
+
+  }, ["cancel", "enter"], function(inp) {
+
+    pushSave("canvas");
+    inp = inp.split("x");
+    can.create(min((int(inp[0]) || 8), 20), min((int(inp[1]) || 8), 20));
+
+    return true;
+
+  }],
+
 };
 
 
@@ -1459,7 +1513,7 @@ frame = function() {
   m.click = false;
 }
 
-createPopup("import palette")
+createPopup("resize canvas")
 
 /*
 thank you codeInWP.com :)

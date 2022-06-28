@@ -11,5 +11,5 @@ TODO:
   local storage autosave
   create color from hex or rgb code
   delete swatch
-  import colors
   import art
+  20x20 limit for canvas resize

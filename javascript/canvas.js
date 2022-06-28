@@ -250,8 +250,8 @@ can = {
 
     if(this.pw !== pw || this.ph !== ph) {
       this.setBackground();
-      this.setCanvas();
     }
+    this.setCanvas();
 
 
   },
