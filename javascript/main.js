@@ -225,8 +225,8 @@ can.draw = function() {
   image(this.canvasImg, can.x, can.y);
 }
 
-can.setPixSize(16);
-can.create(25, 25);
+can.setPixSize(20);
+can.create(8, 11);
 
 /*
 following two functions taken from (here)[https://www.30secondsofcode.org/js/] and adapted to JS by WalkWorthy (@powercoder on Khan Academy)
@@ -1098,6 +1098,7 @@ var windows = {
   }, true),
   "frames": new Window(0, 480, 600, 120, "frames", false, function() {
     var n = ~~(100/max(can.pw, can.ph)) || 1;
+    n = 2;
     image(can.backImg, 10, 490, n*can.pw, n*can.ph);
     image(can.canvasImg, 10, 490, n*can.pw, n*can.ph);
   }, true),
@@ -1187,7 +1188,9 @@ var windows = {
     {txt: "export pixel data", action: function() {
       createPopup("save canvas");
     }},
-    {txt: "import palettes", action: false},
+    {txt: "import palettes", action: function() {
+      createPopup("import palette");
+    }},
     {txt: "import pixel data", action: false},
   ]),
 
@@ -1336,6 +1339,76 @@ popupCodes = {
     return t + "\"";
   }, ["close"], function() { return true; }],
 
+
+  "import palette": [function() {
+
+    return "<h2>Paste in full palette code</h2><input id='pop-answer' type='text' placeholder='var palette = {}'><div id='pop-error'>operation failed.</div>";
+
+  }, ["cancel", "enter"], function(inp) {
+
+    if(confirm("All save data will be lost. Continue?")) {
+      palettes = {};
+
+      saves = [];
+      saveInd = 0;
+
+      var first = 0;
+      for(var i = 0; i < inp.length; i++) {
+        if(inp[i] === '{') {
+          first = i + 1;
+          i = inp.length;
+        }
+      }
+      for(var i = inp.length - 1; i >= 0; i--) {
+        if(inp[i] === '}') {
+          inp = inp.slice(first, i);
+          i = -1;
+        }
+      }
+
+
+      var s = "", n = 0;
+      for(var i = 0; i < inp.length; i++) {
+        if(inp[i] !== " " || n % 2 === 1) {
+          s += inp[i];
+          if(inp[i] === '\"') {
+            n++;
+          }
+        }
+      }
+      inp = s;
+
+      inp = inp.split("},");
+      inp.pop();
+
+      for(var i = 0; i < inp.length; i++) {
+
+        inp[i] = inp[i].split(":{");
+        inp[i][1] = inp[i][1].split("),");
+
+        var q = {};
+
+        for(var j = 0; j < inp[i][1].length - 1; j++) {
+          var ssfkslekflsk = (inp[i][1][j].slice(8, 100)).split(",");
+          q[inp[i][1][j][0]] = [];
+          for(var k = 0; k < ssfkslekflsk.length; k++) {
+            q[inp[i][1][j][0]].push(int(ssfkslekflsk[k]));
+          }
+        }
+
+        palettes[inp[i][0]] = q;
+
+      }
+      pushSave("palettes");
+
+
+      return true;
+    } else {
+      return false;
+    }
+
+  }],
+
 };
 
 
@@ -1386,7 +1459,7 @@ frame = function() {
   m.click = false;
 }
 
-
+createPopup("import palette")
 
 /*
 thank you codeInWP.com :)

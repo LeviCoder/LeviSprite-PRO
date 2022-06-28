@@ -354,7 +354,7 @@ pushSave = function() {
   console.log(n);
 };
 undoSave = function() {
-  if(saveInd >= 0) {
+  if(saveInd > 0) {
     var n = saves[saveInd];
     //console.log(n)
     if(n[0] === "edits") {
