@@ -5,9 +5,6 @@ TODO:
   select tool
   magic select
   move tool
-  move selections
-  canvas resize
-  canvas shifting
   local storage autosave
   create color from hex or rgb code
   delete swatch
