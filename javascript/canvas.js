@@ -219,6 +219,13 @@ can = {
     },
   },
 
+  setSize: function() {
+    this.pw = this.a[0].length;
+    this.ph = this.a.length;
+
+    this.w = this.pw*this.ps;
+    this.h = this.ph*this.ps;
+  },
   create: function(w, h) {
     this.a = [];
 
@@ -250,8 +257,8 @@ can = {
 
     if(this.pw !== pw || this.ph !== ph) {
       this.setBackground();
-      this.setCanvas();
     }
+    this.setCanvas();
 
 
   },
@@ -354,7 +361,7 @@ pushSave = function() {
   console.log(n);
 };
 undoSave = function() {
-  if(saveInd >= 0) {
+  if(saveInd > 0) {
     var n = saves[saveInd];
     //console.log(n)
     if(n[0] === "edits") {

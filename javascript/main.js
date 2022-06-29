@@ -185,7 +185,7 @@ can.setCanvas = function() {
         fill(colors[this.a[y][x]]);
         rect(can.x + x*can.ps, can.y + y*can.ps, can.ps, can.ps);
       } else if(this.a[y][x] !== ".") {
-        console.log("aaaaaaaaaa! " + colors[this.a[y][x]]);
+        console.log("can.setCanvas() says: colors[can.a[" + y + "][" + x + "]] === " + colors[this.a[y][x]]);
       }
     }
   }
@@ -225,8 +225,8 @@ can.draw = function() {
   image(this.canvasImg, can.x, can.y);
 }
 
-can.setPixSize(16);
-can.create(25, 25);
+can.setPixSize(20);
+can.create(3, 3);
 
 /*
 following two functions taken from (here)[https://www.30secondsofcode.org/js/] and adapted to JS by WalkWorthy (@powercoder on Khan Academy)
@@ -1098,6 +1098,7 @@ var windows = {
   }, true),
   "frames": new Window(0, 480, 600, 120, "frames", false, function() {
     var n = ~~(100/max(can.pw, can.ph)) || 1;
+    n = 2;
     image(can.backImg, 10, 490, n*can.pw, n*can.ph);
     image(can.canvasImg, 10, 490, n*can.pw, n*can.ph);
   }, true),
@@ -1187,8 +1188,12 @@ var windows = {
     {txt: "export pixel data", action: function() {
       createPopup("save canvas");
     }},
-    {txt: "import palettes", action: false},
-    {txt: "import pixel data", action: false},
+    {txt: "import palettes", action: function() {
+      createPopup("import palette");
+    }},
+    {txt: "import pixel data", action: function() {
+      createPopup("import canvas");
+    }},
   ]),
 
   "palette options": new Menu(350, 0, 150, "palette options", [
@@ -1324,17 +1329,139 @@ popupCodes = {
 
 
   "save canvas": [function() {
-    var t = "\"" + cInd + "/";
+    var t = "\"\": [\"\", \"" + cInd + "\", \"";
 
     for(var y = 0; y < can.a.length; y++) {
       for(var x = 0; x < can.a[y].length; x++) {
         t += can.a[y][x];
       }
-      t += ","
+      if(y < can.a.length - 1) {
+        t += ",";
+      }
     }
 
-    return t + "\"";
+    return t + "\"],";
   }, ["close"], function() { return true; }],
+
+
+  "import palette": [function() {
+
+    return "<h2>Paste in full palette code</h2><input id='pop-answer' type='text' placeholder='var palette = {}'><div id='pop-error'>operation failed.</div>";
+
+  }, ["cancel", "enter"], function(inp) {
+
+    if(confirm("All save data will be lost. Continue?")) {
+      palettes = {};
+
+      saves = [];
+      saveInd = 0;
+
+      var first = 0;
+      for(var i = 0; i < inp.length; i++) {
+        if(inp[i] === '{') {
+          first = i + 1;
+          i = inp.length;
+        }
+      }
+      for(var i = inp.length - 1; i >= 0; i--) {
+        if(inp[i] === '}') {
+          inp = inp.slice(first, i);
+          i = -1;
+        }
+      }
+
+
+      var s = "", n = 0;
+      for(var i = 0; i < inp.length; i++) {
+        if(inp[i] !== " " || n % 2 === 1) {
+          s += inp[i];
+          if(inp[i] === '\"') {
+            n++;
+          }
+        }
+      }
+      inp = s;
+
+      inp = inp.split("},");
+      inp.pop();
+
+      for(var i = 0; i < inp.length; i++) {
+
+        inp[i] = inp[i].split(":{");
+        inp[i][1] = inp[i][1].split("),");
+
+        var q = {};
+
+        for(var j = 0; j < inp[i][1].length - 1; j++) {
+          var ssfkslekflsk = (inp[i][1][j].slice(8, 100)).split(",");
+          q[inp[i][1][j][0]] = [];
+          for(var k = 0; k < ssfkslekflsk.length; k++) {
+            q[inp[i][1][j][0]].push(int(ssfkslekflsk[k]));
+          }
+        }
+
+        palettes[inp[i][0]] = q;
+
+      }
+      pushSave("palettes");
+
+
+      return true;
+    } else {
+      return false;
+    }
+
+  }],
+
+  "import canvas": [function() {
+
+    return "<h2>Paste in <em>just</em> the art array</h2><input id='pop-answer' type='text' placeholder='[\"(name)\", \"(palette)\", \"(art string)\"],' size='40'><div id='pop-error'>operation failed.</div>";
+
+  }, ["cancel", "enter"], function(inp) {
+
+    // ["blocks", "bubble tea", "a..,.a.,..a"],
+
+    pushSave("canvas");
+
+    inp = inp.split("\", \"");
+
+    var a = [[]];
+
+    var y = 0, x = 0, comma = inp[2][inp[2].length - 1] === "," ? 3 : 2;
+    for(var i = 0; i < inp[2].length - comma; i++) {
+      if(inp[2][i] === ",") {
+        y++;
+        x = 0;
+        a.push([]);
+      } else {
+        a[y].push(inp[2][i])
+      }
+    }
+
+    if(palettes[inp[1]]) {
+      cInd = inp[1];
+      colors = palettes[cInd];
+    }
+
+    can.create(a);
+
+    return true;
+
+  }],
+
+  "resize canvas": [function() {
+
+    return "<h2>Resize canvas</h2><p>only the format WIDTHxHEIGHT works. Limit of 20x20. Wacky inputs will default to 8.</p><input id='pop-answer' type='text' placeholder='e.g. 8x8 or 16x16'><div id='pop-error'>make sure it's in the right format</div>";
+
+  }, ["cancel", "enter"], function(inp) {
+
+    pushSave("canvas");
+    inp = inp.split("x");
+    can.create(min((int(inp[0]) || 8), 20), min((int(inp[1]) || 8), 20));
+
+    return true;
+
+  }],
 
 };
 
@@ -1386,7 +1513,7 @@ frame = function() {
   m.click = false;
 }
 
-
+createPopup("resize canvas")
 
 /*
 thank you codeInWP.com :)
@@ -1445,6 +1572,75 @@ var keyFunc = {
   },
   "v": function() {
     m.setTool("move");
+  },
+
+
+  "ArrowLeft": function() {
+
+    if(can.a[0].length > 1) {
+      pushSave("canvas");
+      if(keys[16]) {
+        for(var i = 0; i < can.a.length; i++) {
+          can.a[i].pop();
+        }
+        can.setSize();
+        can.setBackground();
+      } else {
+        for(var i = 0; i < can.a.length; i++) {
+          can.a[i].push(can.a[i].shift());
+        }
+      }
+      can.setCanvas();
+    }
+
+  },
+  "ArrowRight": function() {
+
+    pushSave("canvas");
+    if(keys[16]) {
+      for(var i = 0; i < can.a.length; i++) {
+        can.a[i].push(".");
+      }
+      can.setSize();
+      can.setBackground();
+    } else {
+      for(var i = 0; i < can.a.length; i++) {
+        can.a[i].unshift(can.a[i].pop());
+      }
+    }
+    can.setCanvas();
+
+  },
+  "ArrowUp": function() {
+
+    if(can.a.length > 1) {
+      pushSave("canvas");
+      if(keys[16]) {
+        can.a.pop();
+        can.setSize();
+        can.setBackground();
+      } else {
+        can.a.push(can.a.shift());
+      }
+      can.setCanvas();
+    }
+  },
+  "ArrowDown": function() {
+
+    pushSave("canvas");
+    if(keys[16]) {
+      var arr = [];
+      for(var i = 0; i <= can.pw; i++) {
+        arr.push(".");
+      }
+      can.a.push(arr);
+      can.setSize();
+      can.setBackground();
+    } else {
+      can.a.unshift(can.a.pop());
+    }
+    can.setCanvas();
+
   },
 
   /*"": function() {
