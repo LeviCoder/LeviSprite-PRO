@@ -185,7 +185,7 @@ can.setCanvas = function() {
         fill(colors[this.a[y][x]]);
         rect(can.x + x*can.ps, can.y + y*can.ps, can.ps, can.ps);
       } else if(this.a[y][x] !== ".") {
-        console.log("aaaaaaaaaa! " + colors[this.a[y][x]]);
+        console.log("can.setCanvas() says: colors[can.a[" + y + "][" + x + "]] === " + colors[this.a[y][x]]);
       }
     }
   }
@@ -1572,6 +1572,75 @@ var keyFunc = {
   },
   "v": function() {
     m.setTool("move");
+  },
+
+
+  "ArrowLeft": function() {
+
+    if(can.a[0].length > 1) {
+      pushSave("canvas");
+      if(keys[16]) {
+        for(var i = 0; i < can.a.length; i++) {
+          can.a[i].pop();
+        }
+        can.setSize();
+        can.setBackground();
+      } else {
+        for(var i = 0; i < can.a.length; i++) {
+          can.a[i].push(can.a[i].shift());
+        }
+      }
+      can.setCanvas();
+    }
+
+  },
+  "ArrowRight": function() {
+
+    pushSave("canvas");
+    if(keys[16]) {
+      for(var i = 0; i < can.a.length; i++) {
+        can.a[i].push(".");
+      }
+      can.setSize();
+      can.setBackground();
+    } else {
+      for(var i = 0; i < can.a.length; i++) {
+        can.a[i].unshift(can.a[i].pop());
+      }
+    }
+    can.setCanvas();
+
+  },
+  "ArrowUp": function() {
+
+    if(can.a.length > 1) {
+      pushSave("canvas");
+      if(keys[16]) {
+        can.a.pop();
+        can.setSize();
+        can.setBackground();
+      } else {
+        can.a.push(can.a.shift());
+      }
+      can.setCanvas();
+    }
+  },
+  "ArrowDown": function() {
+
+    pushSave("canvas");
+    if(keys[16]) {
+      var arr = [];
+      for(var i = 0; i <= can.pw; i++) {
+        arr.push(".");
+      }
+      can.a.push(arr);
+      can.setSize();
+      can.setBackground();
+    } else {
+      can.a.unshift(can.a.pop());
+    }
+    can.setCanvas();
+
   },
 
   /*"": function() {
